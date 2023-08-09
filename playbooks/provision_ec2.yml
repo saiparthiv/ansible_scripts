@@ -27,3 +27,24 @@
     - name: Display instance information
       debug:
         var: ec2.instances[0]
+
+- name: Configure EC2 Instance
+  hosts: launched
+  remote_user: ec2-user
+  become: yes
+  tasks:
+    - name: Update yum cache
+      yum:
+        name: "*"
+        state: latest
+
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable Apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
