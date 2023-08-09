@@ -1,0 +1,46 @@
+---
+- name: Provision EC2 Instance
+  hosts: localhost
+  become: yes
+  gather_facts: False
+  tasks:
+    - name: Create EC2 Instance
+      ec2:
+        key_name: web-dev-key
+        instance_type: t3.micro
+        image: ami-0df2a11dd1fe1f8e3  # Replace with your desired AMI ID
+        wait: yes
+        group: sg-0889aea08fd828811
+        count: 1
+        instance_tags:
+          Name: MyAnsibleInstance
+      register: ec2_instance
+
+    - name: Add new instance to host group
+      add_host:
+        name: "{{ item.public_ip }}"
+        groups: launched
+      loop: "{{ ec2_instance.instances }}"
+
+- name: Configure EC2 Instance
+  hosts: launched
+  remote_user: ec2-user  # Replace with your CentOS remote user
+  become: yes
+  tasks:
+    - name: Update yum cache
+      yum:
+        name: "*"
+        state: latest
+
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Start and enable Apache
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+

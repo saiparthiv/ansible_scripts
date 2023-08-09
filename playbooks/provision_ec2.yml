@@ -1,0 +1,29 @@
+---
+- name: Provision EC2 Instance
+  hosts: localhost
+  remote_user: ec2-user
+  gather_facts: False
+  become: yes
+  tasks:
+    - name: Include AWS credentials
+      include_vars: aws_credentials.yml
+
+    - name: Create EC2 instance
+      ec2_instance:
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        key_name: web-dev-key
+        instance_type: t3.micro
+        image: 
+          id: "ami-0df2a11dd1fe1f8e3"
+        region: us-east-1
+        security_groups: sg-0889aea08fd828811
+        count: 1
+        wait: yes
+        tags:
+          Name: MyEC2Instance
+      register: ec2
+
+    - name: Display instance information
+      debug:
+        var: ec2.instances[0]
