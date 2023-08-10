@@ -2,8 +2,8 @@
 - name: Provision EC2 Instance
   hosts: localhost
   remote_user: ec2-user
-  gather_facts: False
   become: yes
+  gather_facts: False
   tasks:
     - name: Include AWS credentials
       include_vars: aws_credentials.yml
@@ -12,7 +12,7 @@
       ec2_instance:
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
-        key_name: web-dev-key
+        key_name: "web-dev-key"
         instance_type: t3.micro
         image: 
           id: "ami-0df2a11dd1fe1f8e3"
@@ -21,7 +21,7 @@
         count: 1
         wait: yes
         tags:
-          Name: MyEC2Instance
+          Name: AnsibleInstance
       register: ec2
 
     - name: Display instance information
