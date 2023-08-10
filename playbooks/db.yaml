@@ -2,6 +2,11 @@
 - name: Setup DBserver
   hosts: dbserver
   become: yes
+  vars:
+    dbname: sky
+    dbuser: pilot
+    dbpass: aircraft
+
   tasks:
     - name: Install MySQL server
       yum:
@@ -9,8 +14,8 @@
          state: present
          
     - name: Install Python MySQL 
-      yum:
-         name: PyMySQL
+      ansible.builtin.yum:
+         name: python3-PyMySQL
          state: present
 
     - name: Start & Enable maridb service
