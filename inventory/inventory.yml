@@ -3,11 +3,11 @@ all:
     webserver:
       hosts:
         web01:
-          ansible_host: 44.197.133.181
+          ansible_host: 44.215.110.38
     dbserver:
       hosts:
         db01:
-          ansible_host: 34.205.225.156
+          ansible_host: 3.235.88.17
     dc_ohio:
       children:
         webserver:
