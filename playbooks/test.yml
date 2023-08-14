@@ -1,0 +1,26 @@
+---
+
+- name: Testing some sample commands
+  hosts: all
+  become: yes
+  gather_facts: False
+  tasks:
+    - name: Install pip
+      package:
+        name: python3-pip
+        state: latest
+
+    - name: Install AWS CLI
+      pip:
+        name: awscli
+        state: latest
+    
+    - name: Install boto3 on all hosts
+      pip:
+        name: boto3
+        state: present
+
+    - name: Install boto on all hosts
+      pip:
+        name: boto
+        state: present

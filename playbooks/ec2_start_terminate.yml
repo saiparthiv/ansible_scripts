@@ -1,0 +1,51 @@
+---
+- name: Provision and Terminate EC2 Instance
+  hosts: localhost
+  connection: local
+  gather_facts: True
+  become: yes
+
+  vars:
+    image_id: ami-053b0d53c279acc90
+    region: us-east-1
+    key_name: web-dev-key
+    security_group: default
+
+  vars_files:
+    - aws_vars.yml  # Include the encrypted variables file
+
+  tasks:
+    - name: Create EC2 instance
+      amazon.aws.ec2_instance:
+        name: "Launched by Ansible"
+        instance_type: t3.micro
+        image_id: "{{ image_id }}"
+        region: "{{ region }}"
+        key_name: "{{ key_name }}"
+        security_group: "{{ security_group }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        exact_count: 1
+        tags:
+          Name: AnsibleInstance
+        wait: yes
+      register: ec2_info
+
+    - name: Debug info
+      debug:
+        var: ec2_info
+
+    - name: Wait for 1 minute
+      pause:
+        minutes: 1
+
+    - name: Terminate EC2 instance
+      amazon.aws.ec2_instance:
+        instance_ids: "{{ ec2_info.instances[0].instance_id }}"
+        state: terminated
+        filters:
+          instance-state-name: running
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+
+

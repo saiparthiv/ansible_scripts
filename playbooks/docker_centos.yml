@@ -1,0 +1,44 @@
+---
+- name: Install and configure Docker on CentOS  # Name of the Ansible playbook
+  hosts: all  # Specify the target hosts or groups where the playbook will be applied
+  become: true  # Use privilege escalation to become root before executing tasks
+  gather_facts: False  # Disable facts gathering for all hosts
+  tasks:  # List of tasks to be executed on the target hosts
+
+    - name: Install required packages for Docker installation
+      yum:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+        state: present
+      become: true
+
+    - name: Add Docker YUM repository
+      shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      become: true
+
+    - name: Install Docker
+      yum:
+        name: docker-ce
+        state: latest
+      become: true
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+      become: true
+
+    - name: Add user to the docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+        state: latest
+      become: true
